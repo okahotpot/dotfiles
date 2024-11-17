@@ -109,11 +109,7 @@ keybinds clear-defaults=true {
 				move_to_focused_tab true
 			};
 			ToggleFloatingPanes;
-      bind "Ctrl S" {
-        CloseFocus;
-			  SwitchToMode "Normal";
-		  }
-      SwitchToMOde "Normal";
+      SwitchToMode "Normal";
     }
 	}
 	shared_except "normal" "locked" {
