@@ -296,7 +296,6 @@ alias op="opencode"
 alias zz="zed ."
 alias cc='claude'
 alias co='cursor .'
-alias cznvim='cznvim'  # sync nvim config → chezmoi → GitHub
 alias oc='opencode .'
 
 # ============================================================
