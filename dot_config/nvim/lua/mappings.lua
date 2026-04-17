@@ -160,8 +160,8 @@ end, { desc = "LSP references (location list)" })
 -- ============================================================================
 -- QUIT / SAVE (<leader>q)
 -- ============================================================================
-map("n", "<leader>qs", "<cmd>w<CR>",  { desc = "Save file" })
-map("n", "<leader>qw", "<cmd>q!<CR>", { desc = "Quit without saving" })
+map("n", "<leader>qd", "<cmd>qa!<CR>", { desc = "Quit all without saving" })
+map("n", "<leader>qw", "<cmd>wqa<CR>", { desc = "Write all and quit" })
 
 -- ============================================================================
 -- MISC UTILITIES

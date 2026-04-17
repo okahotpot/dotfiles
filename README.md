@@ -2,6 +2,8 @@
 
 Personal dotfiles managed with [chezmoi](https://chezmoi.io).
 
+**Docs:** [chezmoi.io/user-guide](https://www.chezmoi.io/user-guide/command-overview/) · [Quick start](https://www.chezmoi.io/quick-start/) · [How-to guide](https://www.chezmoi.io/user-guide/frequently-asked-questions/usage/)
+
 ## New machine setup
 
 Install chezmoi:
