@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""
+czvivaldi-apply — re-apply saved Vivaldi keyboard settings on a new machine
+
+Usage: czvivaldi-apply [--dry-run]
+
+Reads ~/.config/vivaldi/keybindings.json (managed by chezmoi) and patches
+the keys back into Vivaldi's Default/Preferences file.
+
+IMPORTANT: Quit Vivaldi before running this — it overwrites Preferences on exit.
+"""
+
+import json
+import shutil
+import sys
+from datetime import datetime
+from pathlib import Path
+
+PREFS = Path.home() / ".config/vivaldi/Default/Preferences"
+KEYBINDINGS = Path.home() / ".config/vivaldi/keybindings.json"
+
+DRY_RUN = "--dry-run" in sys.argv
+
+def main():
+    if not KEYBINDINGS.exists():
+        print(f"✗ keybindings.json not found at {KEYBINDINGS}", file=sys.stderr)
+        print("  Run 'chezmoi apply' first to restore it from your dotfiles.", file=sys.stderr)
+        sys.exit(1)
+
+    if not PREFS.exists():
+        print(f"✗ Vivaldi Preferences not found at {PREFS}", file=sys.stderr)
+        print("  Launch Vivaldi once to create the profile, then run this script.", file=sys.stderr)
+        sys.exit(1)
+
+    print("→ Reading saved keybindings...")
+    with open(KEYBINDINGS) as f:
+        keybindings = json.load(f)
+
+    print("→ Reading current Vivaldi Preferences...")
+    with open(PREFS) as f:
+        prefs = json.load(f)
+
+    if "vivaldi" not in prefs:
+        prefs["vivaldi"] = {}
+
+    # Patch only the keyboard-related keys — leave everything else untouched
+    keys_to_patch = ["keyboard", "actions", "chained_commands", "mouse_gestures"]
+    for key in keys_to_patch:
+        if key in keybindings:
+            prefs["vivaldi"][key] = keybindings[key]
+            print(f"  ✓ Patched vivaldi.{key}")
+
+    if DRY_RUN:
+        print("\n[dry-run] No files written.")
+        return
+
+    # Backup the current Preferences before overwriting
+    backup = PREFS.with_suffix(f".backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+    shutil.copy2(PREFS, backup)
+    print(f"→ Backed up original Preferences to {backup.name}")
+
+    print("→ Writing patched Preferences...")
+    with open(PREFS, "w") as f:
+        json.dump(prefs, f, separators=(",", ":"))
+
+    print("✓ Done. Launch Vivaldi to apply the settings.")
+    print(f"  If something looks wrong, restore from: {backup}")
+
+if __name__ == "__main__":
+    main()

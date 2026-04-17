@@ -1,0 +1,14 @@
+# Credentials
+dot_config/jiratui/dot_env
+
+# Browser data (sensitive)
+dot_config/vivaldi/
+
+# nvim is its own git repo
+dot_config/nvim/dot_git/
+
+# macOS metadata
+dot_DS_Store
+**/dot_DS_Store
+.DS_Store
+**/.DS_Store

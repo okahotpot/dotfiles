@@ -1,0 +1,19 @@
+# Credentials — never commit
+# (chezmoi stores .env as dot_env in the source dir)
+dot_config/jiratui/dot_env
+dot_config/zsh/dot_env
+
+# opencode: node_modules is a build artifact
+dot_config/opencode/node_modules
+
+# Raycast compiled extension bundles contain false-positive secret matches
+dot_config/raycast/extensions
+
+# nvim is its own git repo — don't nest it
+dot_config/nvim/dot_git
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+dot_DS_Store
+**/dot_DS_Store

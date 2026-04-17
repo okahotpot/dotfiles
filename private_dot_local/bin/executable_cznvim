@@ -1,0 +1,38 @@
+#!/usr/bin/env zsh
+# cznvim — sync nvim config to chezmoi and push to GitHub
+
+set -e
+
+CHEZMOI_DIR="$HOME/.local/share/chezmoi"
+
+echo "→ Syncing nvim config to chezmoi..."
+chezmoi re-add ~/.config/nvim/
+
+cd "$CHEZMOI_DIR"
+
+if git diff --quiet && git diff --cached --quiet; then
+  echo "✓ No changes to commit."
+  exit 0
+fi
+
+echo "→ Committing changes..."
+git add dot_config/nvim/
+
+CHANGED=$(git diff --cached --name-only | wc -l | tr -d ' ')
+git commit -m "sync nvim config (${CHANGED} file(s) changed)"
+
+echo "→ Pushing to remote..."
+TOKEN=$(gh auth token 2>/dev/null)
+if [[ -z "$TOKEN" ]]; then
+  echo "✗ Not logged into GitHub. Run: gh auth login"
+  exit 1
+fi
+
+ORIGIN=$(git remote get-url origin)
+# Inject token for HTTPS push, restore original URL after
+HTTPS_URL="https://okahotpot:${TOKEN}@github.com/okahotpot/dotfiles.git"
+git remote set-url origin "$HTTPS_URL"
+git push
+git remote set-url origin "$ORIGIN"
+
+echo "✓ Done."

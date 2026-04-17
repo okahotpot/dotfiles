@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""
+czvivaldi-export — extract Vivaldi keyboard settings and push to chezmoi/GitHub
+"""
+
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+PREFS = Path.home() / ".config/vivaldi/Default/Preferences"
+EXPORT = Path.home() / ".config/vivaldi/keybindings.json"
+CHEZMOI_DIR = Path.home() / ".local/share/chezmoi"
+
+def run(cmd, **kwargs):
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, **kwargs)
+    if result.returncode != 0:
+        print(f"✗ Error: {result.stderr.strip()}", file=sys.stderr)
+        sys.exit(1)
+    return result.stdout.strip()
+
+def main():
+    if not PREFS.exists():
+        print(f"✗ Vivaldi Preferences not found at {PREFS}", file=sys.stderr)
+        sys.exit(1)
+
+    print("→ Reading Vivaldi Preferences...")
+    with open(PREFS) as f:
+        prefs = json.load(f)
+
+    vivaldi = prefs.get("vivaldi", {})
+
+    keybindings = {
+        "keyboard": vivaldi.get("keyboard", {}),
+        "actions": vivaldi.get("actions", []),
+        "chained_commands": vivaldi.get("chained_commands", {}),
+        "mouse_gestures": vivaldi.get("mouse_gestures", {}),
+    }
+
+    print(f"→ Writing keybindings to {EXPORT}...")
+    with open(EXPORT, "w") as f:
+        json.dump(keybindings, f, indent=2)
+    print(f"  ✓ Exported {len(keybindings['actions'])} action shortcuts")
+
+    print("→ Syncing to chezmoi...")
+    run("chezmoi add ~/.config/vivaldi/keybindings.json")
+
+    os.chdir(CHEZMOI_DIR)
+    status = run("git status --short")
+    if not status:
+        print("✓ No changes to commit.")
+        return
+
+    # chezmoi prefixes private dirs with "private_"
+    run("git add dot_config/private_vivaldi/")
+    run('git commit -m "sync vivaldi keybindings"')
+
+    print("→ Pushing to GitHub...")
+    token = run("gh auth token")
+    if not token:
+        print("✗ Not logged into GitHub. Run: gh auth login", file=sys.stderr)
+        sys.exit(1)
+
+    run("git remote set-url origin https://okahotpot:{token}@github.com/okahotpot/dotfiles.git".format(token=token))
+    run("git push")
+    run("git remote set-url origin git@github.com:okahotpot/dotfiles.git")
+
+    print("✓ Done.")
+
+if __name__ == "__main__":
+    main()
