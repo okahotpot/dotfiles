@@ -1,0 +1,12 @@
+# Credentials — never commit
+dot_config/jiratui/.env
+
+# opencode: node_modules is a build artifact
+dot_config/opencode/node_modules
+
+# Raycast compiled extension bundles contain false-positive secret matches
+dot_config/raycast/extensions
+
+# macOS metadata
+.DS_Store
+**/.DS_Store

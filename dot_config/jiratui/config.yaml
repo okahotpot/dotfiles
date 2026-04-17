@@ -1,0 +1,18 @@
+# Credentials are loaded from .env (see .env.example)
+# Source it before running: source ~/.config/jiratui/.env
+jira_api_username: "${JIRA_API_USERNAME}"
+jira_api_token: "${JIRA_API_TOKEN}"
+jira_api_base_url: "${JIRA_API_BASE_URL}"
+theme: "dracula"
+
+search_results_default_order: "priority desc"
+auto_search_on_start: true
+pre_defined_jql_expressions:
+  1:
+    label: "Find Oka Lwin active item"
+    expression: "issuetype in ('Back-end Engineering', 'Bug') AND status not in ('Done', 'Abandoned')"
+  2:
+    label: "Oka Lwin created last 30 days - Backend & Bug"
+    expression: "created >= -30d AND creator = \"Oka Lwin\" AND issuetype in ('Back-end Engineering', 'Bug')"
+tui_title_include_jira_server_title: True
+search_results_page_filtering_enabled: true
